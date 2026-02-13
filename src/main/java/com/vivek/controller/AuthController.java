@@ -1,7 +1,8 @@
 package com.vivek.controller;
 
-import com.vivek.dto.AuthResponseDTO;
+
 import com.vivek.dto.LoginRequestDTO;
+import com.vivek.dto.LoginResponse;
 import com.vivek.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,11 +18,9 @@ public class AuthController {
     private AuthService service;
 
     @PostMapping("/login")
-    public AuthResponseDTO login(
+    public LoginResponse login(
             @RequestBody LoginRequestDTO dto) {
 
-        String token = service.login(dto);
-
-        return new AuthResponseDTO(token);
+        return service.login(dto);
     }
 }

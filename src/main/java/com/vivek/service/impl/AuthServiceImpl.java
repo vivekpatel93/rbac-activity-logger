@@ -1,6 +1,7 @@
 package com.vivek.service.impl;
 
 import com.vivek.dto.LoginRequestDTO;
+import com.vivek.dto.LoginResponse;
 import com.vivek.entity.User;
 import com.vivek.repository.UserRepository;
 import com.vivek.security.JwtUtil;
@@ -26,17 +27,22 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public String login(LoginRequestDTO dto){
-        User user=userRepository.findByUserName(dto.getUserName()).orElseThrow(()-> new RuntimeException("Invalid"));
+    public LoginResponse login(LoginRequestDTO dto){
+        User user = userRepository
+                .findByUsername(dto.getUsername())
+                .orElseThrow(() ->
+                        new RuntimeException("Invalid username or password"));
 
-        if(!encoder.matches(dto.getPassword(),user.getPassword())){
-            throw new RuntimeException("Invalid");
+        // ✅ Check encrypted password
+        if (!encoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid username or password");
         }
 
-        return jwtUtil.generateToken(
-                user.getUserName(),
-                user.getRole()
-        );
+        // ✅ Generate Token
+        String token = jwtUtil.generateToken(user.getUsername(),
+                user.getRole());
+
+        return new LoginResponse(token, user.getRole());
     }
 
 }

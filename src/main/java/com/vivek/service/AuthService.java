@@ -1,8 +1,9 @@
 package com.vivek.service;
 
 import com.vivek.dto.LoginRequestDTO;
+import com.vivek.dto.LoginResponse;
 
 public interface AuthService {
 
-    String login(LoginRequestDTO dto);
+    LoginResponse login(LoginRequestDTO dto);
 }

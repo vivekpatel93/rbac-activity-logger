@@ -1,10 +1,10 @@
 package com.vivek.security;
 
-import com.vivek.repository.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,9 +21,6 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    @Autowired
-    private UserRepository userRepo;
-
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,
@@ -31,34 +28,55 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain chain)
             throws ServletException, IOException {
 
+        // ✅ Skip preflight (CORS)
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ Skip login API
+        if (request.getServletPath().equals("/auth/login")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
 
             String token = header.substring(7);
 
-            if (jwtUtil.validate(token)) {
+            try {
 
-                String username =
-                        jwtUtil.extractUsername(token);
+                if (jwtUtil.validate(token)) {
 
-                String role =
-                        jwtUtil.extractRole(token);
+                    String username =
+                            jwtUtil.extractUsername(token);
 
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                username,
-                                null,
-                                List.of(
-                                        new SimpleGrantedAuthority("ROLE_" + role)
-                                ));
+                    String role =
+                            jwtUtil.extractRole(token);
 
-                SecurityContextHolder.getContext()
-                        .setAuthentication(auth);
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    username,
+                                    null,
+                                    List.of(
+                                            new SimpleGrantedAuthority("ROLE_" + role)
+                                    )
+                            );
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(auth);
+                }
+
+            } catch (Exception e) {
+
+                // ❗ Invalid token
+                SecurityContextHolder.clearContext();
             }
         }
 
         chain.doFilter(request, response);
     }
-}
 
+}

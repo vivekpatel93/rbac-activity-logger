@@ -22,7 +22,7 @@ public class UserServiceImpl implements UserService {
 
     private User dtoToEntity(UserRegisterDTO dto){
         User user=new User();
-        user.setUserName(dto.getUserName());
+        user.setUsername(dto.getUserName());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRole(dto.getRole());
         return user;
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     private UserResponseDTO entityToDto(User user){
         UserResponseDTO dto = new UserResponseDTO();
         dto.setId(user.getUserId());
-        dto.setUserName(user.getUserName());
+        dto.setUserName(user.getUsername());
         dto.setRole(user.getRole());
         return dto;
     }
