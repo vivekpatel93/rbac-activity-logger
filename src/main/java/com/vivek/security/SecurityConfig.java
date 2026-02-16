@@ -59,8 +59,8 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
 
                         // Admin only
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
-
+                        .requestMatchers("/admin/**").hasAnyRole("ADMIN","MANAGER")
+                        .requestMatchers("/user/create").hasRole("ADMIN")
                         // Admin + Manager
                         .requestMatchers("/logs/**")
                         .hasAnyRole("ADMIN", "MANAGER")
