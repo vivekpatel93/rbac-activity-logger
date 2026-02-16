@@ -28,14 +28,14 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain chain)
             throws ServletException, IOException {
 
-        // ✅ Skip preflight (CORS)
+        //  Skip preflight (CORS)
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             chain.doFilter(request, response);
             return;
         }
 
-        // ✅ Skip login API
-        if (request.getServletPath().equals("/auth/login")) {
+        //  Skip login API
+        if (request.getServletPath().startsWith("/auth")) {
             chain.doFilter(request, response);
             return;
         }
