@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -18,11 +19,10 @@ public class LogController {
 
     @PostMapping("/user/log")
     public void log(
-            @RequestParam Long userId,
-            @RequestParam String role,
-            @RequestParam String button) {
-
-        service.saveLog(userId, role, button);
+            @RequestParam String button,
+            Principal principal) {
+        String username= principal.getName();
+        service.saveLogByUsername(username,button);
     }
 
     @GetMapping("/logs/all")

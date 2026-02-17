@@ -41,7 +41,7 @@ public class SecurityConfig {
         http
 
                 // Enable CORS properly
-                .cors(cors -> cors.disable()) // We use CorsConfig class
+                .cors(cors -> {}) // We use CorsConfig class
 
                 // Disable CSRF
                 .csrf(csrf -> csrf.disable())
@@ -56,18 +56,20 @@ public class SecurityConfig {
 
                         // Public
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/logout").authenticated()
                         .requestMatchers("/h2-console/**").permitAll()
 
                         // Admin only
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN","MANAGER")
                         .requestMatchers("/user/create").hasRole("ADMIN")
+                        .requestMatchers("/admin/manager-activity").hasRole("ADMIN")
                         // Admin + Manager
                         .requestMatchers("/logs/**")
                         .hasAnyRole("ADMIN", "MANAGER")
 
                         // User only
                         .requestMatchers("/user/**").hasRole("USER")
-
+                        .requestMatchers("/user/log").hasRole("USER")
                         // Others
                         .anyRequest().authenticated()
                 )

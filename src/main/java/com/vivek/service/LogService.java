@@ -8,5 +8,5 @@ public interface LogService {
 
     List<LogDTO> getAllLogs();
 
-    public void saveLog(Long userId, String role, String button);
+    public void saveLogByUsername(String username, String button);
 }

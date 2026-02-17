@@ -17,13 +17,16 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder encoder;
 
     private final JwtUtil jwtUtil;
-
+    private final LoginActivityService loginActivityService;
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository,PasswordEncoder encoder,JwtUtil jwtUtil){
+    public AuthServiceImpl(UserRepository userRepository,
+                           PasswordEncoder encoder,
+                           JwtUtil jwtUtil,
+                           LoginActivityService loginActivityService){
             this.userRepository=userRepository;
             this.encoder=encoder;
             this.jwtUtil=jwtUtil;
-
+            this.loginActivityService=loginActivityService;
     }
 
     @Override
@@ -33,15 +36,18 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(() ->
                         new RuntimeException("Invalid username or password"));
 
-        // ✅ Check encrypted password
+        //  Check encrypted password
         if (!encoder.matches(dto.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid username or password");
         }
 
-        // ✅ Generate Token
+        //  Generate Token
         String token = jwtUtil.generateToken(user.getUsername(),
                 user.getRole());
-
+        //  LOG MANAGER LOGIN
+        if ("MANAGER".equals(user.getRole())) {
+            loginActivityService.save(user.getUsername(), "LOGIN");
+        }
         return new LoginResponse(token, user.getRole());
     }
 

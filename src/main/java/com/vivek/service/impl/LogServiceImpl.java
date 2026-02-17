@@ -2,7 +2,9 @@ package com.vivek.service.impl;
 
 import com.vivek.dto.LogDTO;
 import com.vivek.entity.ActivityLog;
+import com.vivek.entity.User;
 import com.vivek.repository.ActivityLogRepository;
+import com.vivek.repository.UserRepository;
 import com.vivek.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 public class LogServiceImpl implements LogService {
     @Autowired
     private ActivityLogRepository repo;
+    @Autowired
+    private UserRepository userRepository;
 
     private LogDTO mapToDTO(ActivityLog log) {
 
@@ -29,19 +33,21 @@ public class LogServiceImpl implements LogService {
         return dto;
     }
     @Override
-    public void saveLog(Long userId,
-                        String role,
-                        String button) {
+    public void saveLogByUsername(String username, String button) {
+
+        User user = userRepository
+                .findByUsername(username)
+                .orElseThrow();
 
         ActivityLog log = new ActivityLog();
 
-        log.setUserId(userId);
-        log.setRole(role);
+        log.setUserId(user.getUserId());
+        log.setRole(user.getRole());
         log.setButton(button);
-        log.setTimestamp(LocalDateTime.now());
 
         repo.save(log);
     }
+
 
     @Override
     public List<LogDTO> getAllLogs() {
